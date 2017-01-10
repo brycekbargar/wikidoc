@@ -154,12 +154,16 @@ def readGlobalWikidocComments(file):
 
 
 # Get path-to-wkhtmltox and path to wiki
-if not len(sys.argv) == 3:
-	print "usage:\n\t" + sys.argv[0] + " <path-to-wkhtmltopdf> <path-to-wiki-folder>\n\n"
+argCount = len(sys.argv)
+if not argCount == 3 and not argCount == 4:
+	print "usage:\n\t" + sys.argv[0] + " <path-to-wkhtmltopdf> <path-to-wiki-folder> [home.md]\n\n"
 	exit()
 
 pathWkhtmltopdf = sys.argv[1]
 pathWiki = sys.argv[2]
+home = "Home.md"
+if argCount == 4:
+        home = sys.argv[3]
 
 if not pathWiki.endswith("/"):
 	pathWiki = pathWiki + "/"
@@ -180,9 +184,9 @@ if (generateImages and not os.path.isdir(pathWiki + "generated-images")):
 	generateImages = False
 
 11
-# Home.md must be present and it must contain special comments with additional
+# A Home.md must be present and it must contain special comments with additional
 # informations
-(wikidocConfig, wkhtmltopdfConfig) = readGlobalWikidocComments(pathWiki + "Home.md")
+(wikidocConfig, wkhtmltopdfConfig) = readGlobalWikidocComments(pathWiki + home)
 
 
 # Build html, start with global head
@@ -190,17 +194,17 @@ html = list()
 html.append(wikidocConfig["HEAD"])
 
 
-# Append Home.md
-html.append(parseFile(pathWiki, "Home.md"))
+# Append the Home.md
+html.append(parseFile(pathWiki, home))
 
 
 # get all markdown files
 files = sorted(getFilesInDirectory(pathWiki), key=lambda s: s.lower())
 
 
-# Append all other files, except Home.md
+# Append all other files, except the Home.md
 for file in files:
-	if file.endswith(".md") and not file == "Home.md":
+	if file.endswith(".md") and not file == home:
 		html.append(parseFile(pathWiki, file))
 
 
